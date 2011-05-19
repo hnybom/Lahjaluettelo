@@ -75,7 +75,7 @@ public class YahooWeatherParser extends DefaultHandler {
 		} else if (qName.equalsIgnoreCase("yweather:astronomy") && (this.rssFeed != null)) {
 			this.rssFeed.weatherSunrise = attributes.getValue("sunrise");
 			this.rssFeed.weatherSunset = attributes.getValue("sunset");
-		} else if (qName.equalsIgnoreCase("yweather:astronomy") && (this.item != null)) {
+		} else if (qName.equalsIgnoreCase("yweather:condition") && (this.item != null)) {
 			this.item.weatherTemperature = attributes.getValue("temp");
 			this.item.weatherText = attributes.getValue("text");
 		}
