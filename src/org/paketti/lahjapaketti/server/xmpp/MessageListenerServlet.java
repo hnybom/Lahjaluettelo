@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.paketti.lahjapaketti.server.xmpp.commands.CommandFactory;
+
 import com.google.appengine.api.xmpp.JID;
 import com.google.appengine.api.xmpp.Message;
 import com.google.appengine.api.xmpp.MessageBuilder;
@@ -20,7 +22,7 @@ public class MessageListenerServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		final XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		final Message message = xmpp.parseMessage(req);
-
+		CommandFactory.build(message).execute();
 		final JID fromJid = message.getFromJid();
 		final String body = message.getBody();
 		if (xmpp.getPresence(fromJid).isAvailable()) {
