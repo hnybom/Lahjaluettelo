@@ -53,11 +53,11 @@ public class WeatherCommand extends XmppCommand {
 		final JID fromJid = message.getFromJid();
 		final StringBuilder builder = new StringBuilder(feed.title);
 		builder.append("\n");
-		builder.append("Humidity: " + feed.weatherHumidity);
+		builder.append("Humidity: " + feed.weatherHumidity + "%");
 		builder.append("\n");
-		builder.append("Wind speed: " + feed.weatherWindSpeed);
+		builder.append("Wind speed: " + feed.weatherWindSpeed + " km/h");
 		builder.append("\n");
-		builder.append("Air pressure: " + feed.weatherPressure);
+		builder.append("Air pressure: " + feed.weatherPressure + " mb");
 		builder.append("\n");
 		builder.append("Sun rise: " + feed.weatherSunrise);
 		builder.append("\n");
@@ -65,7 +65,7 @@ public class WeatherCommand extends XmppCommand {
 		builder.append("\n");
 
 		for (final Item item : feed.getItems()) {
-			builder.append("Temperature: " + item.weatherTemperature);
+			builder.append("Temperature: " + item.weatherTemperature + " C");
 			builder.append("\n");
 			builder.append("Forecast: " + item.weatherText);
 			builder.append("\n");
