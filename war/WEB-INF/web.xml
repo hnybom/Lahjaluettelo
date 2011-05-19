@@ -16,6 +16,15 @@
     <url-pattern>/lahjaluettelo/greet</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>messageListener</servlet-name>
+    <servlet-class>org.paketti.lahjapaketti.server.xmpp.MessageListenerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>messageListener</servlet-name>
+    <url-pattern>/_ah/xmpp/message/chat/</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>Lahjaluettelo.html</welcome-file>
