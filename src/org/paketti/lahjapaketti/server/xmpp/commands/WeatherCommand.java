@@ -9,6 +9,8 @@ import com.google.appengine.api.xmpp.MessageBuilder;
 
 public class WeatherCommand extends XmppCommand {
 
+	private static final String YAHOO_LOCATION = "http://where.yahooapis.com/v1/places.q({0})?appid=UkewUW7V34FYMFT3pjPVTH7jUQD1rJg0TgrSkf.tDimJn0bYRUU0bjdPXfRosW7Zy64";
+
 	private static final String URL = "http://weather.yahooapis.com/forecastrss?u=c&w=";
 
 	private enum CITY {
