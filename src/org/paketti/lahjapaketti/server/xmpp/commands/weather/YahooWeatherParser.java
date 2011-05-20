@@ -1,4 +1,4 @@
-package org.paketti.lahjapaketti.server.xmpp.commands;
+package org.paketti.lahjapaketti.server.xmpp.commands.weather;
 
 import java.io.InputStream;
 import java.io.Serializable;

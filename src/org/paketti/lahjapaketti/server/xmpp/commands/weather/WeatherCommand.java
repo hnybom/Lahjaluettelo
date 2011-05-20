@@ -1,7 +1,10 @@
-package org.paketti.lahjapaketti.server.xmpp.commands;
+package org.paketti.lahjapaketti.server.xmpp.commands.weather;
 
-import org.paketti.lahjapaketti.server.xmpp.commands.YahooWeatherParser.Item;
-import org.paketti.lahjapaketti.server.xmpp.commands.YahooWeatherParser.RssFeed;
+import java.text.MessageFormat;
+
+import org.paketti.lahjapaketti.server.xmpp.commands.XmppCommand;
+import org.paketti.lahjapaketti.server.xmpp.commands.weather.YahooWeatherParser.Item;
+import org.paketti.lahjapaketti.server.xmpp.commands.weather.YahooWeatherParser.RssFeed;
 
 import com.google.appengine.api.xmpp.JID;
 import com.google.appengine.api.xmpp.Message;
@@ -9,9 +12,10 @@ import com.google.appengine.api.xmpp.MessageBuilder;
 
 public class WeatherCommand extends XmppCommand {
 
-	private static final String YAHOO_LOCATION = "http://where.yahooapis.com/v1/places.q({0})?appid=UkewUW7V34FYMFT3pjPVTH7jUQD1rJg0TgrSkf.tDimJn0bYRUU0bjdPXfRosW7Zy64";
+	private final MessageFormat yahooLocationRequestUrl = new MessageFormat(
+			"http://where.yahooapis.com/v1/places.q({0})?appid=UkewUW7V34FYMFT3pjPVTH7jUQD1rJg0TgrSkf.tDimJn0bYRUU0bjdPXfRosW7Zy64");
 
-	private static final String URL = "http://weather.yahooapis.com/forecastrss?u=c&w=";
+	private static final String YAHOO_WEATHER_URL = "http://weather.yahooapis.com/forecastrss?u=c&w=";
 
 	private enum CITY {
 		TAMPERE {
@@ -44,11 +48,22 @@ public class WeatherCommand extends XmppCommand {
 
 	@Override
 	public void execute() {
-		for (final CITY city : CITY.values()) {
-			final YahooWeatherParser yahooWeatherParser = new YahooWeatherParser(URL + city.getWOIEDCode());
-			yahooWeatherParser.parse();
-			printWeather(yahooWeatherParser.getFeed());
+		final String[] splittedBody = message.getBody().split(" ");
+		if (splittedBody.length > 1) {
+			final YahooLocationParser yahooLocationParser = new YahooLocationParser(
+					yahooLocationRequestUrl.format(splittedBody[1]));
+			yahooLocationParser.parse();
+			fetchAndPrintWeather(yahooLocationParser.getWoeid());
+
+		} else {
+			fetchAndPrintWeather(CITY.TAMPERE.getWOIEDCode());
 		}
+	}
+
+	private void fetchAndPrintWeather(final String woeid) {
+		final YahooWeatherParser yahooWeatherParser = new YahooWeatherParser(YAHOO_WEATHER_URL + woeid);
+		yahooWeatherParser.parse();
+		printWeather(yahooWeatherParser.getFeed());
 	}
 
 	private void printWeather(final RssFeed feed) {
