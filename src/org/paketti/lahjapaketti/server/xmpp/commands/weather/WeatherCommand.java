@@ -51,9 +51,10 @@ public class WeatherCommand extends XmppCommand {
 		final String[] splittedBody = message.getBody().split(" ");
 		if (splittedBody.length > 1) {
 			final YahooLocationParser yahooLocationParser = new YahooLocationParser(
-					yahooLocationRequestUrl.format(splittedBody[1]));
+					yahooLocationRequestUrl.format(new Object[] { splittedBody[1] }));
 			yahooLocationParser.parse();
-			fetchAndPrintWeather(yahooLocationParser.getWoeid());
+			fetchAndPrintWeather(yahooLocationParser.getWoeid() == null ? CITY.TAMPERE.getWOIEDCode() : yahooLocationParser
+					.getWoeid());
 
 		} else {
 			fetchAndPrintWeather(CITY.TAMPERE.getWOIEDCode());
