@@ -1,40 +1,56 @@
 package org.paketti.lahjapaketti.server.xmpp.commands;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
+
 public class YahooWeatherParser extends DefaultHandler {
-	private String urlString;
+	private String url;
 	private RssFeed rssFeed;
 	private StringBuilder text;
 	private Item item;
 	private boolean imgStatus;
 
 	public YahooWeatherParser(String url) {
-		this.urlString = url;
+		this.url = url;
 		this.text = new StringBuilder();
 	}
 
 	public void parse() {
+
+		rssFeed = getFromCache(url);
+		if (rssFeed != null) {
+			return;
+		}
+
 		InputStream urlInputStream = null;
 		SAXParserFactory spf = null;
 		SAXParser sp = null;
 
 		try {
-			URL url = new URL(this.urlString);
-			urlInputStream = url.openConnection().getInputStream();
+			URL rssUrl = new URL(this.url);
+			urlInputStream = rssUrl.openConnection().getInputStream();
 			spf = SAXParserFactory.newInstance();
 			if (spf != null) {
 				sp = spf.newSAXParser();
 				sp.parse(urlInputStream, this);
+				putToCache(url, rssFeed);
 			}
 		}
 		/*
@@ -143,7 +159,10 @@ public class YahooWeatherParser extends DefaultHandler {
 		this.text.append(ch, start, length);
 	}
 
-	public static class RssFeed {
+	public static class RssFeed implements Serializable {
+
+		private static final long serialVersionUID = 4393961575657314559L;
+
 		public String title;
 		public String description;
 		public String link;
@@ -182,7 +201,10 @@ public class YahooWeatherParser extends DefaultHandler {
 
 	}
 
-	public static class Item {
+	public static class Item implements Serializable {
+
+		private static final long serialVersionUID = 7297752047616368114L;
+
 		public String title;
 		public String description;
 		public String link;
@@ -193,6 +215,33 @@ public class YahooWeatherParser extends DefaultHandler {
 		@Override
 		public String toString() {
 			return (this.title + ": " + this.pubDate + "n" + this.description);
+		}
+	}
+
+	private RssFeed getFromCache(final Object key) {
+		final Cache cache = getCache();
+		if (cache != null) {
+			return (RssFeed) cache.get(key);
+		}
+		return null;
+	}
+
+	private void putToCache(final Object key, final Object o) {
+		final Cache cache = getCache();
+		if (cache != null) {
+			cache.put(key, o);
+		}
+	}
+
+	private Cache getCache() {
+		final Map<Integer, Integer> props = new HashMap<Integer, Integer>();
+		props.put(GCacheFactory.EXPIRATION_DELTA, 3600);
+
+		try {
+			CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+			return cacheFactory.createCache(props);
+		} catch (CacheException e) {
+			return null;
 		}
 	}
 

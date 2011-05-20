@@ -59,9 +59,9 @@ public class WeatherCommand extends XmppCommand {
 		builder.append("\n");
 		builder.append("Air pressure: " + feed.weatherPressure + " mb");
 		builder.append("\n");
-		builder.append("Sun rise: " + feed.weatherSunrise);
+		builder.append("Sunrise: " + feed.weatherSunrise);
 		builder.append("\n");
-		builder.append("Sun set: " + feed.weatherSunset);
+		builder.append("Sunset: " + feed.weatherSunset);
 		builder.append("\n");
 
 		for (final Item item : feed.getItems()) {
